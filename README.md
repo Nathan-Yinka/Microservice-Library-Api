@@ -28,8 +28,7 @@ The system uses a microservices architecture with the following components:
 
 ## File Structure
 
-```python
-.
+```plaintext
 ├── README.md
 ├── adminapi
 │   ├── Dockerfile
@@ -79,7 +78,7 @@ Access the Swagger UI to view the API documentation and interact with the API en
 - Admin API Swagger: http://localhost:8000
 
 ### Configuration
-Environmental variables for configuring the system are located in the .env files within the project directories.
+Environmental variables for configuring the system are located in the docker compose  file within the root folder
 
 ### Authors
 - Oludare Nathaniel
