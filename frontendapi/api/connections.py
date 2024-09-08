@@ -4,7 +4,14 @@ import time
 import json
 
 class RabbitMQClient:
+    """
+    A client for managing connections and interactions with RabbitMQ. Handles connection retries, message publishing,
+    and message consumption with robust error handling and connection management.
+    """
     def __init__(self):
+        """
+        Initializes the RabbitMQClient with configurations pulled from Django settings.
+        """
         self.host = settings.RABBITMQ_HOST
         self.port = settings.RABBITMQ_PORT
         self.username = settings.RABBITMQ_USERNAME
@@ -13,6 +20,10 @@ class RabbitMQClient:
         self.delay = settings.RABBITMQ_RETRY_DELAY
 
     def _get_connection(self):
+        """
+        Attempts to establish a blocking connection to RabbitMQ with a retry mechanism.
+        Retries a specified number of times with a delay between attempts if the connection fails.
+        """
         credentials = pika.PlainCredentials(self.username, self.password)
         connection_params = pika.ConnectionParameters(host=self.host, port=self.port, credentials=credentials)
 
@@ -28,11 +39,13 @@ class RabbitMQClient:
                     raise
 
     def publish_message(self, message, queue, properties=None):
+        """
+        Publishes a message to a specified RabbitMQ queue. Messages are made durable and can be serialized if they are dictionaries.
+        """
         connection = self._get_connection()
         channel = connection.channel()
         channel.queue_declare(queue=queue, durable=True)
 
-        # Serialize message if it's a dictionary
         if isinstance(message, dict):
             message = json.dumps(message)
 
@@ -40,12 +53,16 @@ class RabbitMQClient:
             exchange='',
             routing_key=queue,
             body=message,
-            properties=pika.BasicProperties(**(properties or {"delivery_mode":2}))
+            properties=pika.BasicProperties(**(properties or {"delivery_mode": 2}))
         )
         print(f"Message sent to {queue}: {message}")
         connection.close()
 
     def consume_messages(self, queue, callback):
+        """
+        Consumes messages from a specified RabbitMQ queue and processes them using a provided callback function.
+        Acknowledges messages only if they are processed successfully.
+        """
         connection = self._get_connection()
         channel = connection.channel()
         channel.queue_declare(queue=queue, durable=True)
@@ -53,7 +70,7 @@ class RabbitMQClient:
         def on_message_callback(ch, method, properties, body):
             try:
                 message = body.decode('utf-8')
-                message = json.loads(body)
+                message = json.loads(message)
                 print(f"Received message: {message}")
                 callback(message)
                 ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -65,5 +82,5 @@ class RabbitMQClient:
         print(f"[*] Waiting for messages on {queue}. To exit press CTRL+C")
         channel.start_consuming()
 
-
+# Instance creation
 rabbitmq_client = RabbitMQClient()

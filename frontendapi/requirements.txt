@@ -4,3 +4,4 @@ pika
 psycopg2-binary
 python-dotenv
 dj-database-url
+drf-yasg

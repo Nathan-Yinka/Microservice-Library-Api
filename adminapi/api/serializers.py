@@ -7,9 +7,11 @@ class BookSerializer(serializers.ModelSerializer):
         model = Book
         fields = '__all__'
         
-    def create(self, validated_data):
-        validated_data['available'] = True
-        return super().create(validated_data)
+class BookCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        exclude = ['available']
+        
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

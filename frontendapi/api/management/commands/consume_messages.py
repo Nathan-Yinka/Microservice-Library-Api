@@ -20,10 +20,8 @@ class Command(BaseCommand):
         thread.daemon = True
         thread.start()
 
-        # Wait for the thread to complete, or keep the main thread alive
-        thread.join()  # Remove this if you want other operations to run concurrently in the main thread
-
-        # To keep the command running, you can use a simple loop
+        thread.join() 
+        
         try:
             while True:
                 continue  # Keep the main thread alive

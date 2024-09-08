@@ -1,17 +1,20 @@
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Book
 
-
 def handle_book_update(message):
     """
-    Handle messages to update the book database.
-    Messages can instruct to add, update, or remove a book.
+    Process incoming messages to manage book entries in the database based on the specified action.
+    The function supports adding a new book, updating an existing one, or removing a book based on the message details.
+
+    Args:
+        message (dict): Contains the details of the book and the action ('add', 'update', 'remove') to be performed.
+
+    The function logs the outcome of the operation, including any additions, updates, or deletions of book records.
     """
-    action = message.pop('action')
+    action = message.pop('action') 
     book_id = message.get('id')
 
-    if action == 'update' or action == 'add':
-        # Use update_or_create to handle both adding and updating
+    if action in ['update', 'add']:
         book, created = Book.objects.update_or_create(
             id=book_id,
             defaults=message
@@ -20,10 +23,9 @@ def handle_book_update(message):
             print(f"Added new book with ID {book_id}")
         else:
             print(f"Updated book with ID {book_id}")
-    
+
     elif action == 'remove':
         try:
-            # Attempt to delete the book
             book = Book.objects.get(id=book_id)
             book.delete()
             print(f"Removed book with ID {book_id}")
