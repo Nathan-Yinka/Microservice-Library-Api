@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  frontend_db:
+    image: postgres
+    volumes:
+      - frontend_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: frontend_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  admin_db:
+    image: postgres
+    volumes:
+      - admin_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: admin_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  rabbitmq:
+    image: rabbitmq:management
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontendapi:
+    build: ./frontendapi
+    restart: always
+    ports:
+      - "8001:8001"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@frontend_db/frontend_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    volumes:
+      - ./frontendapi:/frontendapi
+
+  adminapi:
+    build: ./adminapi
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@admin_db/admin_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    volumes:
+      - ./adminapi:/backendapi
+
+volumes:
+  frontend_data:
+  admin_data:
