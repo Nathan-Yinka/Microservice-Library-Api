@@ -56,14 +56,30 @@ The system uses a microservices architecture with the following components:
 ### Installation
 Clone the repository and navigate into the project directory:
 ```bash
-git clone https://github.com/Nathan-Yinka/Microservice-Library-Api.git
-cd Microservice-Library-Api
+    git clone https://github.com/Nathan-Yinka/Microservice-Library-Api.git
+    cd Microservice-Library-Api
 ```
 
 Build and launch the containers:
 ```bash
-docker-compose up --build
+    docker-compose up --build
 ```
+
+### Running Tests
+To ensure the quality and functionality of our services, we employ automated tests. Here's how you can run tests for each service:
+
+#### Frontend API Tests
+To run tests for the frontend service, execute:
+```bash
+    docker-compose exec frontendapi python manage.py test
+```
+
+#### Admin API Tests
+To run tests for the admin service, execute:
+```bash
+    docker-compose exec adminapi python manage.py test
+```
+
 
 ### Usage
 Once the services are up and running, you can access:
@@ -82,3 +98,5 @@ Environmental variables for configuring the system are located in the docker com
 
 ### Authors
 - Oludare Nathaniel
+
+
