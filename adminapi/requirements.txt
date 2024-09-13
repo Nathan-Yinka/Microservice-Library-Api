@@ -6,3 +6,4 @@ python-dotenv
 dj-database-url
 drf-yasg
 model-bakery
+django-cors-headers
